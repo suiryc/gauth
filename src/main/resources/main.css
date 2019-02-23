@@ -1,0 +1,17 @@
+/* Use different color similar to focus, and change mouse pointer to hint the
+ * text can be clicked.
+ */
+.otp-code {
+    -fx-cursor: hand;
+    -fx-text-fill: -fx-accent;
+}
+
+/* Emphasis on hovering. */
+.otp-code:hover {
+  -fx-effect: dropshadow(three-pass-box, -fx-focus-color, 4, 0.0, 1, 1);
+}
+
+/* Emphasis when clicking on text. */
+.otp-code:pressed {
+  -fx-effect: dropshadow(three-pass-box, -fx-focus-color, 1, 0.0, 1, 1);
+}

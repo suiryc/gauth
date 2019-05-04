@@ -12,7 +12,7 @@ import suiryc.gauth.core.TOTP;
 import suiryc.gauth.core.TOTPGenerator;
 import suiryc.gauth.core.TimeInterval;
 
-public class Main extends Application {
+public class Main {
 
     private static List<Secret> secrets = new ArrayList<>();
 
@@ -26,13 +26,21 @@ public class Main extends Application {
         // Start task that will display the codes in console and UI.
         new DisplayTask(true);
         // Start UI.
-        launch(args);
+        new App().start(args);
     }
 
-    @Override
-    public void start(Stage stage) throws Exception {
-        // Build and display the main window.
-        MainController.build(stage, secrets);
+    public static class App extends Application {
+
+        public void start(String... args) {
+            launch(args);
+        }
+
+        @Override
+        public void start(Stage stage) throws Exception {
+            // Build and display the main window.
+            MainController.build(stage, secrets);
+        }
+
     }
 
     public static class DisplayTask extends TimerTask {

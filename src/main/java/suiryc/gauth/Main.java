@@ -83,7 +83,7 @@ public class Main {
                     if (stdout) {
                         // Display new codes in console.
                         System.out.println(
-                            String.format("  %" + labelLength + "s: OTP=%s  OTP+1=%s",
+                            String.format("  %" + labelLength + "s: OTP= %s  OTP+1= %s",
                                 totp.getSecret().getLabel(), totp.getOtp(), totp.getNextOtp())
                         );
                     }

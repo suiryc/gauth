@@ -6,7 +6,7 @@
 
     <groupId>suiryc</groupId>
     <artifactId>gauth</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <properties>
         <!-- Remain compatible with Java 10 -->

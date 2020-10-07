@@ -1,4 +1,4 @@
-package suiryc.gauth.core;
+package suiryc.totp.core;
 
 import java.nio.charset.StandardCharsets;
 import static org.junit.Assert.assertEquals;

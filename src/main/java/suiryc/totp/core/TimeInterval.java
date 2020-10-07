@@ -1,20 +1,19 @@
-package suiryc.gauth.core;
+package suiryc.totp.core;
 
 public class TimeInterval {
 
-    private long interval;
+    private final long interval;
     private long value;
 
     /**
-     * Creates current time interval information.
+     * Creates time interval handler.
      *
      * @param interval time interval in seconds
      */
     public TimeInterval(long interval) {
         interval *= 1000;
         this.interval = interval;
-        long now = System.currentTimeMillis();
-        value = now / interval;
+        refresh();
     }
 
     /** Gets interval duration (ms). */
@@ -36,6 +35,18 @@ public class TimeInterval {
     /** Gets how many ms remain before reaching the next interval. */
     public long getRemaining() {
         return Math.max(0, interval - getElapsed());
+    }
+
+    /**
+     * Refreshes interval to current time.
+     *
+     * @return whether current interval did change
+     */
+    public boolean refresh() {
+        long value = System.currentTimeMillis() / interval;
+        if (value == this.value) return false;
+        this.value = value;
+        return true;
     }
 
 }

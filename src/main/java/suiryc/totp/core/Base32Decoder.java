@@ -1,4 +1,4 @@
-package suiryc.gauth.core;
+package suiryc.totp.core;
 
 /**
  * Base32 decoder.
@@ -9,14 +9,14 @@ public class Base32Decoder {
 
     // The base32 alphabet.
     // 0 and 1 being not present, there is no confusion with O, l or I.
-    private static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
     // The base (number of values).
-    private static int BASE = 32;
+    private static final int BASE = 32;
     // How many bits per base32 character.
-    private static int BASE_BITS = Integer.numberOfTrailingZeros(BASE);
+    private static final int BASE_BITS = Integer.numberOfTrailingZeros(BASE);
     // How many bits per byte.
-    private static int BYTE_BITS = 8;
+    private static final int BYTE_BITS = 8;
 
     public static byte[] decode(String encoded) throws Exception {
         // Remove any whitespace, and make uppercase (for alphabet).

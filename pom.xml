@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>suiryc</groupId>
-    <artifactId>gauth</artifactId>
+    <artifactId>totps</artifactId>
     <version>1.1</version>
 
     <properties>
@@ -72,7 +72,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>suiryc.gauth.Main</mainClass>
+                            <mainClass>suiryc.totp.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -91,7 +91,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>suiryc.gauth.Main</mainClass>
+                                    <mainClass>suiryc.totp.Main</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

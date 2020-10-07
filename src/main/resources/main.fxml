@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<HBox minHeight="400.0" minWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="suiryc.gauth.controller.MainController">
+<HBox minHeight="400.0" minWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="suiryc.totp.controller.MainController">
    <children>
       <StackPane HBox.hgrow="SOMETIMES">
          <children>
@@ -21,7 +21,7 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </HBox.margin>
       </StackPane>
-      <GridPane fx:id="secretsPane" hgap="15.0" vgap="10.0" HBox.hgrow="NEVER">
+      <GridPane fx:id="totpsPane" hgap="15.0" vgap="10.0" HBox.hgrow="NEVER">
         <columnConstraints>
           <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="80.0" />
           <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="80.0" />

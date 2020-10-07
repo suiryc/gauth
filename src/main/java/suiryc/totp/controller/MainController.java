@@ -1,4 +1,4 @@
-package suiryc.gauth.controller;
+package suiryc.totp.controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,11 +21,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import suiryc.gauth.Main;
-import suiryc.gauth.core.Secret;
-import suiryc.gauth.core.TOTP;
-import suiryc.gauth.core.TOTPGenerator;
-import suiryc.gauth.core.TimeInterval;
+import suiryc.totp.Main;
+import suiryc.totp.core.TOTP;
+import suiryc.totp.core.TimeInterval;
 
 // Notes:
 // We don't need 'Initializible.initialize', especially because we wish to
@@ -38,13 +36,13 @@ public class MainController {
     private ProgressIndicator progressIndicator;
 
     @FXML
-    private GridPane secretsPane;
+    private GridPane totpsPane;
 
     private Text percentageText;
 
-    private Map<Secret, SecretRow> secretsRows = new HashMap<>();
+    private final Map<TOTP, TOTPRow> totpsRows = new HashMap<>();
 
-    protected void initialize(List<Secret> secrets) {
+    protected void initialize(List<TOTP> totps) {
         // If the height of the progress indicator is larger than its width, the
         // (almost) square graphic is displayed at the top of the node. Due to
         // this, with FXML only it does not appear possible to center it inside
@@ -63,7 +61,7 @@ public class MainController {
         percentageText = (Text)progressIndicator.lookup(".percentage");
         percentageText.setText("");
         progressIndicator.progressProperty().addListener(
-            (observable, oldValue, newValue) -> percentageText.setText((int)Math.ceil(TOTPGenerator.TIME_INTERVAL * newValue.doubleValue()) + "s")
+            (observable, oldValue, newValue) -> percentageText.setText((int)Math.ceil(TOTP.TIME_INTERVAL * newValue.doubleValue()) + "s")
         );
 
         // We don't want to display the 'check mark' when progress is at 100%.
@@ -75,23 +73,23 @@ public class MainController {
         StackPane tick = (StackPane)progressIndicator.lookup(".tick");
         tick.getStyleClass().remove("tick");
 
-        // Add secrets rows.
+        // Add totps rows.
         // Note: row 0 (table headers) already used.
-        int secretIdx = 1;
-        for (Secret secret : secrets) {
+        int totpIdx = 1;
+        for (TOTP totp : totps) {
             RowConstraints rowConstraints = new RowConstraints(Region.USE_COMPUTED_SIZE) {{ setValignment(VPos.CENTER); }};
-            secretsPane.getRowConstraints().add(rowConstraints);
+            totpsPane.getRowConstraints().add(rowConstraints);
 
-            SecretRow secretRow = new SecretRow(secret);
-            secretsRows.put(secret, secretRow);
-            secretsPane.addRow(secretIdx++, secretRow.getLabel(), secretRow.getOtpLabel(), secretRow.getNextOtpLabel());
+            TOTPRow totpRow = new TOTPRow(totp);
+            totpsRows.put(totp, totpRow);
+            totpsPane.addRow(totpIdx++, totpRow.getLabel(), totpRow.getOtpLabel(), totpRow.getNextOtpLabel());
         }
 
         // Now that rows have been added, wait a bit (defer execution in JavaFX)
         // to resize the stage taking into account the preferred (computed)
         // scene size.
         Platform.runLater(() -> {
-            Scene scene = secretsPane.getScene();
+            Scene scene = totpsPane.getScene();
             Parent root = scene.getRoot();
             Stage stage = (Stage)scene.getWindow();
             // Keep the decoration dimensions (between scene and stage).
@@ -114,17 +112,17 @@ public class MainController {
         Platform.runLater(() -> progressIndicator.setProgress(remaining / interval));
     }
 
-    public void updateSecret(Secret secret, TOTP totp) {
+    public void updateTOTP(TOTP totp) {
         // Display OTP for given secret.
-        SecretRow secretRow = secretsRows.get(secret);
-        if (secretRow == null) return;
+        TOTPRow totpRow = totpsRows.get(totp);
+        if (totpRow == null) return;
         Platform.runLater(() -> {
-            secretRow.getOtpLabel().setText(totp.getOtp());
-            secretRow.getNextOtpLabel().setText(totp.getNextOtp());
+            totpRow.getOtpLabel().setText(totp.getOtp());
+            totpRow.getNextOtpLabel().setText(totp.getNextOtp());
         });
     }
 
-    public static void build(Stage stage, List<Secret> secrets) throws Exception {
+    public static void build(Stage stage, List<TOTP> totps) throws Exception {
         // 32px icon
         stage.getIcons().setAll(new Image("/gauth-32.png", 0.0, 0.0, true, false, false));
 
@@ -136,7 +134,7 @@ public class MainController {
         // some resources - Skins - to be built).
         MainController controller = loader.getController();
         Platform.runLater(() -> {
-            controller.initialize(secrets);
+            controller.initialize(totps);
             Main.DisplayTask.setController(controller);
         });
 
@@ -144,7 +142,7 @@ public class MainController {
         stage.setScene(new Scene(root));
         stage.getScene().getStylesheets().add(MainController.class.getResource("/main.css").toExternalForm());
 
-        stage.setTitle("Google Authenticator");
+        stage.setTitle("Time-based One-Time Passwords");
         // Upon closing, stop background task then exit JavaFX.
         stage.setOnCloseRequest(evt -> {
             Main.DisplayTask.stop();
@@ -153,14 +151,14 @@ public class MainController {
         stage.show();
     }
 
-    static class SecretRow {
+    private static class TOTPRow {
 
-        private Label label;
-        private Label otpLabel;
-        private Label nextOtpLabel;
+        private final Label label;
+        private final Label otpLabel;
+        private final Label nextOtpLabel;
 
-        public SecretRow(Secret secret) {
-            label = new Label(secret.getLabel()) {{ setFont(new Font(16)); }};
+        public TOTPRow(TOTP totp) {
+            label = new Label(totp.getLabel()) {{ setFont(new Font(16)); }};
             // Customize (CSS) OTP text nodes, and copy code in clipboard when
             // clicked.
             otpLabel = new Label() {{ setFont(new Font(24)); }};

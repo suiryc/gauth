@@ -120,7 +120,7 @@ public class Main {
             // immediately display the current codes (in the UI only).
             if (first) displayCodes(false);
             // Update progress indicator.
-            if (controller != null) controller.updateIndicator(timeInterval);
+            if (controller != null) controller.updateIndicators();
         }
 
         public static void setController(MainController controller) {

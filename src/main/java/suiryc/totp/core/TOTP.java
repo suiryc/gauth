@@ -57,6 +57,11 @@ public class TOTP {
         return label;
     }
 
+    /** Gets TOTP time interval. */
+    public TimeInterval getTimeInterval() {
+        return timeInterval;
+    }
+
     /** Gets TOTP code. */
     public String getOtp() {
         return otp;

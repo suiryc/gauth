@@ -68,64 +68,41 @@ public class Main {
 
         private void run(boolean force) {
             // Make sure we do refresh the time interval first.
-            boolean changed = timeInterval.refresh();
-            // We at least need to display the progress indicator.
-            updateControllerIndicator(false);
-            if (!changed && !force) {
-                // Next time interval not reached yet, nothing else to do.
-                reschedule();
-                return;
-            }
-            // Next time interval reached, time to update displayed codes.
-            displayCodes(true);
-            reschedule();
-        }
+            boolean changed = timeInterval.refresh() || force;
 
-        private static void displayCodes(boolean stdout) {
             int labelLength = 0;
             int otpLength = 0;
 
-            if (stdout) {
+            if (changed) {
                 System.out.printf("Interval: %8s; Elapsed: %2ss; Remaining: %2ss%n",
-                    timeInterval.getValue(), Math.round(timeInterval.getElapsed() / 1000D),
-                    Math.round(timeInterval.getRemaining() / 1000D));
+                        timeInterval.getValue(), Math.round(timeInterval.getElapsed() / 1000D),
+                        Math.round(timeInterval.getRemaining() / 1000D));
                 labelLength = totps.stream().map(v -> v.getLabel().length()).max(Integer::compareTo).orElse(0);
                 otpLength = totps.stream().map(v -> v.getOtp().length()).max(Integer::compareTo).orElse(0);
             }
             for (TOTP totp : totps) {
                 try {
-                    totp.refresh();
-                    if (stdout) {
+                    if (changed) {
+                        totp.refresh();
                         // Display new codes in console.
                         System.out.printf("  %" + labelLength + "s: OTP= %-" + otpLength + "s  OTP+1= %-" + otpLength + "s%n",
-                            totp.getLabel(), totp.getOtp(), totp.getNextOtp());
+                                totp.getLabel(), totp.getOtp(), totp.getNextOtp());
                     }
-                    // Display new codes in UI.
+                    // Update UI (progress, and possibly codes).
                     if (controller != null) controller.updateTOTP(totp);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
-            if (stdout) System.out.println("------------------------------------------------");
-        }
+            if (changed) System.out.println("------------------------------------------------");
 
-        private void reschedule() {
             // Run again at the next second.
             long nextSecond = 1000 - (System.currentTimeMillis() % 1000);
             timer.schedule(new DisplayTask(false), nextSecond);
         }
 
-        private static void updateControllerIndicator(boolean first) {
-            // When first setting the controller (once initialized), we want to
-            // immediately display the current codes (in the UI only).
-            if (first) displayCodes(false);
-            // Update progress indicator.
-            if (controller != null) controller.updateIndicators();
-        }
-
         public static void setController(MainController controller) {
             DisplayTask.controller = controller;
-            updateControllerIndicator(true);
         }
 
         public static void stop() {

@@ -69,12 +69,6 @@ public class MainController {
         });
     }
 
-    public void updateIndicators() {
-        for (TOTPRow totpRow: totpsRows.values()) {
-            totpRow.update();
-        }
-    }
-
     public void updateTOTP(TOTP totp) {
         // Display OTP for given secret.
         TOTPRow totpRow = totpsRows.get(totp);
@@ -148,6 +142,8 @@ public class MainController {
                     }
                 }
             };
+
+            update();
         }
 
         private void handleClipboard(Label label) {

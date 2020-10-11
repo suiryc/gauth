@@ -136,7 +136,7 @@ public class MainController {
                         // We wish to display the remaining number of seconds.
                         // The progress is the elapsed number of seconds, with
                         // a 1s offset.
-                        return (int)Math.round(TOTP.TIME_INTERVAL * (1 - progress) + 1) + "s";
+                        return (int)Math.round(totp.getTimeInterval().getIntervalSeconds() * (1 - progress) + 1) + "s";
                     } else {
                         return super.formatProgressText(progress);
                     }
@@ -195,8 +195,7 @@ public class MainController {
                 nextOtpLabel.autosize();
                 TimeInterval timeInterval = totp.getTimeInterval();
                 double elapsed = Math.floor(timeInterval.getElapsed() / 1000D) + 1;
-                double interval = timeInterval.getInterval() / 1000D;
-                progressIndicator.setProgress(elapsed / interval);
+                progressIndicator.setProgress(elapsed / timeInterval.getIntervalSeconds());
             });
         }
 

@@ -16,7 +16,7 @@ public class TOTPTest {
         String secret512 = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNA=";
 
         // See https://tools.ietf.org/html/rfc4226#page-32
-        TOTP totp = new TOTP("SHA1", secret, new TimeInterval(30));
+        TOTP totp = new TOTP("SHA1", secret);
         assertEquals("755224", totp.generate(0));
         assertEquals("287082", totp.generate(1));
         assertEquals("359152", totp.generate(2));

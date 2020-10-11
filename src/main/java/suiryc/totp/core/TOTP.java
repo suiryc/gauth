@@ -14,10 +14,10 @@ import java.nio.ByteBuffer;
 public class TOTP {
 
     // Dfault OTP hash algorithm: HMAC-SHA-1.
-    private static final String HASH_ALGORITHM = "HMACSHA1";
+    public static final String HASH_ALGORITHM = "HMACSHA1";
 
     // Default generated OTP length: 6 digits.
-    private static final int OTP_LENGTH = 6;
+    public static final int OTP_LENGTH = 6;
 
     // Default OTP time interval: 30s.
     public static int TIME_INTERVAL = 30;
@@ -48,8 +48,8 @@ public class TOTP {
         refresh();
     }
 
-    public TOTP(String label, String secret, TimeInterval timeInterval) throws Exception {
-        this(label, secret, HASH_ALGORITHM, OTP_LENGTH, timeInterval);
+    public TOTP(String label, String secret) throws Exception {
+        this(label, secret, HASH_ALGORITHM, OTP_LENGTH, new TimeInterval(TIME_INTERVAL));
     }
 
     /** Gets TOTP label. */

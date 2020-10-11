@@ -12,28 +12,66 @@ import suiryc.totp.core.TimeInterval;
 
 public class Main {
 
-    private static final TimeInterval timeInterval = new TimeInterval(TOTP.TIME_INTERVAL);
+    private static final List<TimeInterval> timeIntervals = new ArrayList<>();
     private static final List<TOTP> totps = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
         for (String arg : args) {
+            String secret = null;
+            String hashAlgorithm = TOTP.HASH_ALGORITHM;
+            int otpLength = TOTP.OTP_LENGTH;
+            int interval = TOTP.TIME_INTERVAL;
+
             String[] split = arg.split("=", 2);
             if (split.length != 2) throw new Exception("Invalid TOTP format: expected 'label=value', got '" + arg + "'");
             String label = split[0].trim();
-            split = split[1].split(",", 3);
+            split = split[1].split(",");
             if (split.length == 1) {
-                TOTP totp = new TOTP(label, split[0].trim(), timeInterval);
-                totps.add(totp);
-            } else if (split.length == 3) {
-                TOTP totp = new TOTP(label, split[2].trim(), split[0].trim(), Integer.parseInt(split[1].trim()), timeInterval);
-                totps.add(totp);
+                secret = split[0].trim();
             } else {
-                throw new Exception("Invalid TOTP format: expected 'label=hash-alg,otp-length,secret', got '" + arg + "'");
+                for (String s: split) {
+                    String[] param = s.split(":", 2);
+                    if (param.length != 2) {
+                        throw new Exception("Invalid TOTP format: expected 'label=key1:value1,... with a secret', got '" + arg + "'");
+                    }
+                    String paramValue = param[1].trim();
+                    switch (param[0].trim().toLowerCase()) {
+                        case "secret":
+                            secret = paramValue;
+                            break;
+                        case "hash":
+                            hashAlgorithm = paramValue;
+                            break;
+                        case "len":
+                            otpLength = Integer.parseInt(paramValue);
+                            break;
+                        case "interval":
+                            interval = Integer.parseInt(paramValue);
+                            break;
+                        default:
+                            throw new Exception("Unhandled key=<" + label + "> parameter=<" + param[0] + ">");
+                    }
+                }
+                if (secret == null) {
+                    throw new Exception("Invalid TOTP format: expected 'label=key1:value1,... with a secret', got '" + arg + "'");
+                }
             }
+            int finalInterval = interval;
+            TimeInterval timeInterval = timeIntervals.stream().filter(v -> v.getIntervalSeconds() == finalInterval).findFirst().orElseGet(() -> {
+                TimeInterval ti = new TimeInterval(finalInterval);
+                timeIntervals.add(ti);
+                return ti;
+            });
+            TOTP totp = new TOTP(label, secret, hashAlgorithm, otpLength, timeInterval);
+            totps.add(totp);
         }
 
-        // Start task that will display the codes in console and UI.
-        new DisplayTask(true);
+        // Sort time intervals in reverse order: to display the longer ones
+        // (refreshed less often) before the shorted ones.
+        timeIntervals.sort((v1, v2) -> (int)(v2.getInterval() - v1.getInterval()));
+
+        // Start tasks that will display the codes in console and refresh UI.
+        timeIntervals.forEach(timeInterval -> new DisplayTask(timeInterval, true));
         // Start UI.
         new App().start(args);
     }
@@ -57,7 +95,10 @@ public class Main {
         private static MainController controller;
         private static final Timer timer = new Timer();
 
-        public DisplayTask(boolean auto) {
+        private final TimeInterval timeInterval;
+
+        public DisplayTask(TimeInterval timeInterval, boolean auto) {
+            this.timeInterval = timeInterval;
             if (auto) run(true);
         }
 
@@ -81,6 +122,8 @@ public class Main {
                 otpLength = totps.stream().map(v -> v.getOtp().length()).max(Integer::compareTo).orElse(0);
             }
             for (TOTP totp : totps) {
+                // Only deal with TOTPs using our time interval.
+                if (totp.getTimeInterval() != timeInterval) continue;
                 try {
                     if (changed) {
                         totp.refresh();
@@ -98,7 +141,7 @@ public class Main {
 
             // Run again at the next second.
             long nextSecond = 1000 - (System.currentTimeMillis() % 1000);
-            timer.schedule(new DisplayTask(false), nextSecond);
+            timer.schedule(new DisplayTask(timeInterval, false), nextSecond);
         }
 
         public static void setController(MainController controller) {

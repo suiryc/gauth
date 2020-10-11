@@ -21,6 +21,11 @@ public class TimeInterval {
         return interval;
     }
 
+    /** Gets interval duration in seconds. */
+    public long getIntervalSeconds() {
+        return interval / 1000;
+    }
+
     /** Gets this time interval (index) value. */
     public long getValue() {
         return value;
